@@ -1,11 +1,15 @@
 const inquirer = require("inquirer");
 const fs = require("fs");
-const Employee = require("./lib/Employee");
+const path = require("path");
 const Manager = require("./lib/Manager");
 const Engineer = require("./lib/Engineer");
 const Intern = require("./lib/Intern");
+const generateTeam = require("./src/page-template");
 
-const myTeam = [];
+const out_dir = path.resolve(__dirname, "output");
+const outputPath = path.join(out_dir, "team.html");
+
+const team = [];
 
 const manager = [
   {
@@ -74,18 +78,20 @@ const intern = [
     name: "internSchool",
     message: "What is your intern's school?",
   },
- 
 ];
 
 const employee = [
-    {
-        type: "list",
-        message: "What type of team member would you like to add?",
-        name: "employeeRole",
-        choices: [ "Engineer", "Intern", "I don't want to add any more team members"]
-      },
+  {
+    type: "list",
+    message: "What type of team member would you like to add?",
+    name: "employeeRole",
+    choices: [
+      "Engineer",
+      "Intern",
+      "I don't want to add any more team members",
+    ],
+  },
 ];
-
 
 function createManager() {
   inquirer.prompt(manager).then((answers) => {
@@ -96,7 +102,7 @@ function createManager() {
       answers.managerEmail,
       answers.managerOfficeNumber
     );
-    myTeam.push(manager);
+    team.push(manager);
     createEmployee();
   });
   //running prompt for manager questions
@@ -106,80 +112,61 @@ function createManager() {
 }
 createManager();
 
-
 function createEngineer() {
-    inquirer.prompt(engineer).then((answers) => {
-        console.log(answers);
-        const engineer = new Engineer(
-            answers.engineerName,
-            answers.engineerId,
-            answers.engineerEmail,
-            answers.engineerGitHub
-            );
-            myTeam.push(engineer);
-            createEmployee();
-        });
-        //running prompt for engineer questions
-        //using answers from prompt create engineer class
-        //store created engineer in variable
-        //call function for createTeamMember
+  inquirer.prompt(engineer).then((answers) => {
+    console.log(answers);
+    const engineer = new Engineer(
+      answers.engineerName,
+      answers.engineerId,
+      answers.engineerEmail,
+      answers.engineerGitHub
+    );
+    team.push(engineer);
+    createEmployee();
+  });
+  //running prompt for engineer questions
+  //using answers from prompt create engineer class
+  //store created engineer in variable
+  //call function for createTeamMember
+}
+
+function createIntern() {
+  inquirer.prompt(intern).then((answers) => {
+    console.log(answers);
+    const intern = new Intern(
+      answers.internName,
+      answers.internId,
+      answers.internEmail,
+      answers.internSchool
+    );
+    team.push(intern);
+    createEmployee();
+  });
+  //running prompt for intern questions
+  //using answers from prompt create intern class
+  //store created intern in variable
+  //call function for createTeamMember
+}
+
+function createEmployee() {
+  inquirer.prompt(employee).then((answers) => {
+    switch (answers.employeeRole) {
+      case "Engineer":
+        return createEngineer();
+      case "Intern":
+        return createIntern();
+
+      default:
+        return createTeam();
     }
-    createEngineer();
-    
-    function createIntern() {
-        inquirer.prompt(intern).then((answers) => {
-            console.log(answers);
-            const intern = new Intern(
-                answers.internName,
-                answers.internId,
-                answers.internEmail,
-                answers.internSchool
-                );
-                myTeam.push(intern);
-                createEmployee();
-            });
-            //running prompt for intern questions
-            //using answers from prompt create intern class
-            //store created intern in variable
-            //call function for createTeamMember
-        }
-        createIntern();
-        
-        function createEmployee() {
-            inquirer.prompt(employee).then((answers) => {
-                console.log(answers);
-                const employee = new Employee(
-                    answers.employeeRole,
-                    );
-                    myTeam.push(employee);
-                createEngineer();
-                createIntern();
-                });
-          //running prompt for team questions
-          //for engineer call create engineer function
-          //for intern call intern function
-          //for done run build team function
-        }
-        createTeam();
+  });
+  //running prompt for team questions
+  //for engineer call create engineer function
+  //for intern call intern function
+  //for done run build team function
+}
 
-        // function team() {
-            //call writetofile function with variable
-            function writeToFile(fileName, data) {
-                fs.writeFile(fileName, generateHTML(data), (err) => {
-                    if (err) throw new Error("THERE WAS AN ERROR");
-                    
-                    console.log("Generating HTML");
-                });
-            }
-        // }
-
-        // function team();
-        
-        function init() {
-            inquirer.prompt(engineer).then((answers) => {
-                writeToFile("index.html", answers);
-                console.log(answers);
-            });
-        }
-        
-    
+function createTeam() {
+  console.log("All done! Your new team has been created!");
+  fs.writeFileSync(outputPath, generateTeam(team), "utf-8");
+}
