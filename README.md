@@ -6,7 +6,7 @@ Below is a screenshot of the application and a gif running through the steps to 
 ![Screenshot of webpage](assets/teamscreenshot.png)
 
 
-![Gif of application](develop/README.gif)
+![Gif of application](assets/TeamProfileGif.gif)
 
 Run the following command at the root of your project and answer the prompted questions to produced your Team Profile today:
 
