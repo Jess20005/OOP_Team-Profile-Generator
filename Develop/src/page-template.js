@@ -55,7 +55,8 @@ const generateTeam = (team) => {
     </div>
 </div>
         `;
-  };``
+  };
+  ``;
 
   const html = [];
 
@@ -112,7 +113,7 @@ module.exports = (team) => {
             </div>
         </div>
     </div>
-</body>
+
 </html>
     `;
 };
